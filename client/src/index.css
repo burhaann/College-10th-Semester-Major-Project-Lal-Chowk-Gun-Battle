@@ -31,6 +31,12 @@ body {
   border: 1px solid #ccc;
   padding: 10px;
   transition: transform 0.3s ease-in-out;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100vh;
+  backdrop-filter: blur(10px);
 }
 
 .chat-container.hidden {
@@ -38,10 +44,12 @@ body {
 }
 
 .chat-messages {
-  max-height: 95vh;
   overflow-y: auto;
   white-space: pre-wrap; /* Wrap text even within words */
   word-break: break-word;
+
+  max-height: 95vh;
+  margin-top: 2vh;
 }
 
 .chat-input-container {
@@ -64,6 +72,13 @@ body {
   right: -110px;
   padding: 5px 10px;
   cursor: pointer;
+
+  background-color: #007bffb4; /* Set the background color */
+  color: #fff; /* Set the text color */
+  border: none; /* Remove the default border */
+  font-size: 16px; /* Set the font size */
+  border-radius: 5px; /* Add rounded corners */
+  padding: 10px 10px; /* Add padding for better appearance */
 }
 
 .camera-button {

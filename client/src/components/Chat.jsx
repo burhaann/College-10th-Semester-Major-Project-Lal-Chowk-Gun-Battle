@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { messagesAtom, socket } from "./SocketManager";
 import { useAtom } from "jotai";
+import { myPlayer, usePlayersList, me } from "playroomkit";
 
 const Chat = () => {
   const [messages, setMessages] = useAtom(messagesAtom);
+
+  const players = usePlayersList(true);
+  const name = players.map((player) =>
+    myPlayer()?.id === player.id ? player.state.profile?.name : ""
+  );
+  useEffect(() => {
+    setUsername(name[0]);
+  }, [name[0]]);
 
   const [input, setInput] = useState("");
   const [username, setUsername] = useState("");
@@ -15,6 +24,16 @@ const Chat = () => {
   const chatMessagesRef = useRef(null);
 
   const sendMessage = () => {
+    if (!input.trim()) {
+      // Input is empty or contains only whitespace
+      alert("Message box empty. Please enter a Message");
+      return;
+    }
+    // if (!username.trim()) {
+    //   // Username is empty or contains only whitespace
+    //   alert("Please enter a Username");
+    //   return;
+    // }
     const data = { username, input };
     socket.emit("chat", data); // Send chat message to server
     setInput("");
@@ -73,7 +92,7 @@ const Chat = () => {
             </div>
           ))}
         </div>
-        <div className="username-container">
+        {/* <div className="username-container">
           Username:
           <input
             ref={usernameRef}
@@ -81,7 +100,7 @@ const Chat = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-        </div>
+        </div> */}
         <div className="chat-input-container">
           <input
             ref={inputRef}
