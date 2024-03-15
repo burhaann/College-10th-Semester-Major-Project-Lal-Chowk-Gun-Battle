@@ -56,6 +56,7 @@ const Chat = () => {
       chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
   }, [messages]);
+  useEffect(() => {}, []);
   useEffect(() => {
     const handleXKeyPress = (event) => {
       if (
@@ -76,10 +77,15 @@ const Chat = () => {
     function onChat(data) {
       setMessages((prevMessages) => [...prevMessages, data]);
     }
-
+    function onChatted(messages) {
+      setMessages((prevMessages) => [...prevMessages, ...messages]);
+    }
     socket.on("chat", onChat);
+    socket.on("chatted", onChatted);
+
     return () => {
       socket.off("chat", onChat);
+      socket.off("chatted", onChatted);
     };
   }, []);
   return (
