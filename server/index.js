@@ -30,9 +30,9 @@ const chatSchema = new mongoose.Schema({
 const ChatMessage = mongoose.model("ChatMessage", chatSchema);
 
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "/client/build")));
+app.use(express.static(path.join(__dirname, "/client/dist")));
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
 
 io.on("connection", (socket) => {
