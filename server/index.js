@@ -15,8 +15,8 @@ const io = new Server({
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.PORT || 3001;
-// io.listen(3001);
+const PORT = process.env.PORT || 3000;
+io.listen(process.env.SOCKET_PORT);
 
 let connectedUsersCount = 0;
 
@@ -31,9 +31,9 @@ const ChatMessage = mongoose.model("ChatMessage", chatSchema);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "../client/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+// });
 
 io.on("connection", (socket) => {
   connectedUsersCount++;
@@ -72,5 +72,6 @@ io.on("connection", (socket) => {
   });
 });
 server.listen(PORT, () => {
+  // io.listen(3001);
   console.log(`Server is running on port ${PORT}`);
 });
