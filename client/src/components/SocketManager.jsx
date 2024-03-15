@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-export const socket = io("/:3001");
+export const socket = io("http://localhost:3001");
 export const messagesAtom = atom([]);
 
 export const SocketManager = () => {
