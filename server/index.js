@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { createServer } from "http";
 import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
@@ -13,7 +14,7 @@ const io = new Server({
 });
 
 const app = express();
-const server = require("http").createServer(app);
+const server = createServer(app);
 const PORT = process.env.PORT || 3001;
 // io.listen(3001);
 
