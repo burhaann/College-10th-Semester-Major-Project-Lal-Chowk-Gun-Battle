@@ -2,9 +2,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-export const socket = io(
-  "https://college-10th-semester-major-project-lal.onrender.com/"
-);
+export const socket = io(process.env.URL);
 export const messagesAtom = atom([]);
 
 export const SocketManager = () => {
