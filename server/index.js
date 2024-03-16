@@ -7,16 +7,21 @@ import path from "path";
 
 dotenv.config();
 
-const io = new Server({
-  cors: {
-    origin: process.env.ORIGIN,
-  },
-});
+// const io = new Server({
+//   cors: {
+//     origin: process.env.ORIGIN,
+//   },
+// });
 
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 3000;
-io.listen(process.env.SOCKET_PORT);
+// io.listen(process.env.SOCKET_PORT);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.ORIGIN,
+  },
+});
 
 let connectedUsersCount = 0;
 
@@ -31,7 +36,7 @@ const ChatMessage = mongoose.model("ChatMessage", chatSchema);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "../client/dist")));
-app.get("*", (req, res) => {
+app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
 
@@ -72,6 +77,6 @@ io.on("connection", (socket) => {
   });
 });
 server.listen(PORT, () => {
-  // io.listen(3001);
+  // io.listen(process.env.SOCKET_PORT);
   console.log(`Server is running on port ${PORT}`);
 });
