@@ -6,6 +6,7 @@ import { Suspense, useState } from "react";
 import { Experience } from "./components/Experience";
 import { Leaderboard } from "./components/Leaderboard";
 import Chat from "./components/Chat";
+import VoiceChat from "./components/VoiceChat";
 
 function App() {
   const [downgradedPerformance, setDowngradedPerformance] = useState(false);
@@ -41,6 +42,7 @@ function App() {
         )}
       </Canvas>
       <Chat />
+      <VoiceChat />
     </>
   );
 }

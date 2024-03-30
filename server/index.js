@@ -27,6 +27,13 @@ let connectedUsersCount = 0;
 
 mongoose.connect(process.env.MONGODB_URI);
 
+mongoose.connection.on("connected", () => console.log("connected"));
+mongoose.connection.on("open", () => console.log("open"));
+mongoose.connection.on("disconnected", () => console.log("disconnected"));
+mongoose.connection.on("reconnected", () => console.log("reconnected"));
+mongoose.connection.on("disconnecting", () => console.log("disconnecting"));
+mongoose.connection.on("close", () => console.log("close"));
+
 const chatSchema = new mongoose.Schema({
   username: String,
   input: String,
@@ -39,6 +46,9 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
+
+//Voice Chat ----------------
+const onlineUsers = {};
 
 io.on("connection", (socket) => {
   connectedUsersCount++;
@@ -61,6 +71,16 @@ io.on("connection", (socket) => {
       ChatMessage.deleteMany({})
         .then(() => console.log("Database wiped"))
         .catch((err) => console.error("Error wiping database:", err));
+      //Voice Chat ----------------
+      const onlineUsers = {};
+    }
+    //Voice Chat ----------------
+    const username = onlineUsers[socket.id];
+
+    if (username) {
+      delete onlineUsers[socket.id];
+
+      io.emit("allonlineusers", Object.values(onlineUsers));
     }
   });
 
@@ -74,6 +94,17 @@ io.on("connection", (socket) => {
     message.save().catch((err) => console.error("Error saving message:", err));
 
     io.emit("chat", data); // Broadcast the message to all connected clients
+  });
+
+  // Voice Chat --------------------------------
+  socket.on("joinedusername", (username) => {
+    onlineUsers[socket.id] = username;
+
+    io.emit("allonlineusers", Object.values(onlineUsers));
+  });
+
+  socket.on("audio", (data) => {
+    socket.broadcast.emit("audio1", data);
   });
 });
 server.listen(PORT, () => {

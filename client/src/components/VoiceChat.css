@@ -1,0 +1,165 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+body {
+    margin: 20px;
+    background-color: #000;
+    height: 100%;
+}
+.main {
+    display: flex;
+    justify-content: center;
+}
+
+#microphone-icon {
+    cursor: pointer;
+    border: 2px solid black;
+    padding: 100px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    user-select: none;
+    height: 300px;
+    width: 300px;
+    p {
+        color: #f7ffff;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+}
+.userlist {
+    width: 90%;
+    background-color: rgb(24, 24, 24);
+    display: grid;
+    grid-template-rows: 1fr;
+    gap: 10px;
+    overflow-y: auto;
+
+    /* For WebKit (Chrome, Safari, etc.) */
+    &::-webkit-scrollbar {
+        width: 1px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgb(24, 24, 24);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #ffffff;
+        border-radius: 6px;
+        border: 3px solid #ffffff;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        overflow-y: visible;
+
+        /* or overflow: visible; */
+        &::-webkit-scrollbar {
+            display: none;
+            /* Hide the scrollbar */
+        }
+    }
+}
+.header {
+    height: 70px;
+    color: rgb(0, 136, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 10px;
+    background-color: rgb(50, 50, 50);
+}
+
+.fixed-voice {
+    height: 35vh;
+}
+
+.joineduser {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    padding: 10px;
+
+    background-color: rgba(50, 50, 50, 0.25);
+    margin-bottom: 10px;
+}
+
+
+.mic-image {
+    font-size: 80px;
+    color: black;
+}
+
+/* ------------------------------------------------------------------------ */
+.container-voice{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    padding: 10px;
+    transition: transform 0.3s ease-in-out;
+    z-index: 999;
+  
+  }
+  .chat-container-voice {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid #ccc;
+    padding: 10px;
+    transition: transform 0.3s ease-in-out;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+  }
+  
+  .chat-container-voice.hidden {
+    transform: translateX(-100%);
+  }
+  
+  .chat-messages-voice {
+    overflow-y: auto;
+    white-space: pre-wrap; /* Wrap text even within words */
+    word-break: break-word;
+  
+    max-height: 95vh;
+    margin-top: 2vh;
+    margin-bottom: 50px;
+  }
+  
+  .chat-input-container-voice {
+    display: flex;
+  
+  }
+  
+  
+  .toggle-button-voice {
+    position: absolute;
+    bottom: 10px;
+    left: -110px;
+    padding: 5px 10px;
+    cursor: pointer;
+
+  
+    background-color: #007bffb4; /* Set the background color */
+    color: #fff; /* Set the text color */
+    border: none; /* Remove the default border */
+    font-size: 16px; /* Set the font size */
+    border-radius: 5px; /* Add rounded corners */
+    padding: 10px 10px; /* Add padding for better appearance */
+  }
+  
