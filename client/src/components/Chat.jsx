@@ -46,9 +46,14 @@ const Chat = () => {
       sendMessage();
     }
   };
+  // useEffect(() => {
+  //   inputRef.current.focus();
+  // }, []);
   useEffect(() => {
-    inputRef.current.focus();
-  }, []);
+    if (isChatVisible) {
+      inputRef.current.focus();
+    }
+  }, [isChatVisible]);
 
   useEffect(() => {
     // Scroll chat-messages to bottom when messages change
