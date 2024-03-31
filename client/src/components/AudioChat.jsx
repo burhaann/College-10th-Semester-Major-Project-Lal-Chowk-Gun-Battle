@@ -1,6 +1,6 @@
 import "./AudioChat.css";
 import { socket } from "./SocketManager";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BiMicrophoneOff, BiMicrophone } from "react-icons/bi";
 import { myPlayer, usePlayersList } from "playroomkit";
 
@@ -32,13 +32,11 @@ const AudioChat = () => {
   });
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    socket.emit("userInformation", userStatus);
-    return () => {};
-  }, []);
+  const userStatusRef = useRef(userStatus);
 
   useEffect(() => {
     socket.emit("userInformation", userStatus);
+    userStatusRef.current = userStatus;
   }, [userStatus]);
 
   useEffect(() => {
@@ -61,7 +59,11 @@ const AudioChat = () => {
         var fileReader = new FileReader();
         fileReader.readAsDataURL(audioBlob);
         fileReader.onloadend = function () {
-          if (!userStatus.microphone || !userStatus.online) return;
+          if (
+            !userStatusRef.current.microphone ||
+            !userStatusRef.current.online
+          )
+            return;
 
           var base64String = fileReader.result;
           socket.emit("voice", base64String);
