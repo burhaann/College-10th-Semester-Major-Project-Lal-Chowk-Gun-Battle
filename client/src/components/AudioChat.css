@@ -18,15 +18,6 @@ body {
     justify-content: center;
 
 }
-body{
-    display: flex;
-    text-align: center;
-    flex-flow: column;
-    margin: 0;
-    padding: 0;
-    background-color: rgb(12 11 25);
-    color: #fff;
-}
 header{
     margin:0;
     padding: 20px 0;
