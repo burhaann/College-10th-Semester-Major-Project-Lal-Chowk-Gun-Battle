@@ -105,7 +105,7 @@ ul.users li{
     padding: 10px;
     transition: transform 0.3s ease-in-out;
     z-index: 999;
-  
+
   }
   .chat-container-voice {
     position: fixed;
@@ -140,6 +140,7 @@ ul.users li{
   
   .chat-input-container-voice {
     display: flex;
+    margin-bottom: 50px;
   
   }
   
@@ -147,7 +148,7 @@ ul.users li{
   .toggle-button-voice {
     position: absolute;
     bottom: 10px;
-    left: -130px;
+    left: 100px;
     padding: 5px 10px;
     cursor: pointer;
 

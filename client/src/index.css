@@ -54,6 +54,7 @@ body {
 
 .chat-input-container {
   display: flex;
+  margin-bottom: 50px;
 
 }
 
@@ -69,7 +70,7 @@ body {
 .toggle-button {
   position: absolute;
   bottom: 10px;
-  right: -110px;
+  right: 110px;
   padding: 5px 10px;
   cursor: pointer;
 
