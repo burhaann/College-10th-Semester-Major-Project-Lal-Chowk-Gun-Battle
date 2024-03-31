@@ -10,94 +10,100 @@ body {
     background-color: #000;
     height: 100%;
 }
-.main {
+.controller{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
     display: flex;
     justify-content: center;
+
 }
-
-#microphone-icon {
-    cursor: pointer;
-    border: 2px solid black;
-    padding: 100px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    user-select: none;
-    height: 300px;
-    width: 300px;
-    p {
-        color: #f7ffff;
-        font-size: 18px;
-        margin-top: 20px;
-    }
-}
-.userlist {
-    width: 90%;
-    background-color: rgb(24, 24, 24);
-    display: grid;
-    grid-template-rows: 1fr;
-    gap: 10px;
-    overflow-y: auto;
-
-    /* For WebKit (Chrome, Safari, etc.) */
-    &::-webkit-scrollbar {
-        width: 1px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: rgb(24, 24, 24);
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: #ffffff;
-        border-radius: 6px;
-        border: 3px solid #ffffff;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-        background-color: #ffffff;
-    }
-
-    @media (max-width: 768px) {
-        overflow-y: visible;
-
-        /* or overflow: visible; */
-        &::-webkit-scrollbar {
-            display: none;
-            /* Hide the scrollbar */
-        }
-    }
-}
-.header {
-    height: 70px;
-    color: rgb(0, 136, 255);
+body{
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-left: 10px;
-    background-color: rgb(50, 50, 50);
-}
-
-.fixed-voice {
-    height: 35vh;
-}
-
-.joineduser {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    text-align: center;
+    flex-flow: column;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(12 11 25);
     color: #fff;
+}
+header{
+    margin:0;
+    padding: 20px 0;
+    width: 100%;
+    height: fit-content;
+    background-color: rgb(15, 15, 44);
+    color: #fff;
+
+}
+.control-btn{
+    width: 120px;
+    padding: 10px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.enable-btn{
+    background-color: rgb(26, 184, 26);
+    color: #fff;
+    border-bottom: 5px solid rgb(18, 131, 18);
+    margin: 10px ;
+}
+
+.enable-btn:hover{
+    border-bottom: none;
+    margin-top: 15px;
+}
+.disable-btn{
+    margin: 10px ;
+    background-color: rgb(0, 0, 0);
+    color: #fff;
+    border-bottom: 5px solid rgb(184, 57, 57);
+}
+.disable-btn:hover{
+    border-bottom: none;
+    margin-top: 15px;
+}
+.username-btn{
+    width: 200px;
+    margin: 10px auto;
+    padding: 10px 0;
+}
+input{
+    width: 200px;
     padding: 10px;
-
-    background-color: rgba(50, 50, 50, 0.25);
-    margin-bottom: 10px;
+    margin: 10px auto;
 }
 
-
-.mic-image {
-    font-size: 80px;
-    color: black;
+#username-div{
+    display: none;
 }
+#username-label{
+    width: 200px;
+    height: fit-content;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: rgb(12 11 25);
+    border-radius: 8px;
+    border: 2px solid rgb(26, 26, 77);
+    cursor: pointer;
+}
+ul.users{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+ul.users li{
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px 0;
+    text-align: center;
+    background-color: rgb(15 15 44);
+    list-style: none;
+    color: #fff;
+    border-radius: 8px;
+}
+
 
 /* ------------------------------------------------------------------------ */
 .container-voice{
@@ -150,7 +156,7 @@ body {
   .toggle-button-voice {
     position: absolute;
     bottom: 10px;
-    left: -110px;
+    left: -130px;
     padding: 5px 10px;
     cursor: pointer;
 

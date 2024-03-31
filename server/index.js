@@ -47,10 +47,15 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
 
-//Voice Chat ----------------
-const onlineUsers = {};
+//Audio Chat --------------------------------------------------------
+const socketsStatus = {};
 
 io.on("connection", (socket) => {
+  //Audio Chat --------------------------------------------------------
+  const socketId = socket.id;
+  socketsStatus[socket.id] = {};
+  //------------------------------------------------------------------
+
   connectedUsersCount++;
   // Retrieve all messages from MongoDB and emit to the client
   ChatMessage.find({})
@@ -71,17 +76,9 @@ io.on("connection", (socket) => {
       ChatMessage.deleteMany({})
         .then(() => console.log("Database wiped"))
         .catch((err) => console.error("Error wiping database:", err));
-      //Voice Chat ----------------
-      const onlineUsers = {};
     }
-    //Voice Chat ----------------
-    const username = onlineUsers[socket.id];
-
-    if (username) {
-      delete onlineUsers[socket.id];
-
-      io.emit("allonlineusers", Object.values(onlineUsers));
-    }
+    //Audio Chat --------------------------------------------------------
+    delete socketsStatus[socketId];
   });
 
   // Listen for chat messages
@@ -96,15 +93,21 @@ io.on("connection", (socket) => {
     io.emit("chat", data); // Broadcast the message to all connected clients
   });
 
-  // Voice Chat --------------------------------
-  socket.on("joinedusername", (username) => {
-    onlineUsers[socket.id] = username;
+  //Audio Chat --------------------------------------------------------
+  socket.on("voice", function (data) {
+    var newData = data.split(";");
+    newData[0] = "data:audio/ogg;";
+    newData = newData[0] + newData[1];
 
-    io.emit("allonlineusers", Object.values(onlineUsers));
+    for (const id in socketsStatus) {
+      if (id != socketId && !socketsStatus[id].mute && socketsStatus[id].online)
+        socket.broadcast.to(id).emit("send", newData);
+    }
   });
+  socket.on("userInformation", function (data) {
+    socketsStatus[socketId] = data;
 
-  socket.on("audio", (data) => {
-    socket.broadcast.emit("audio1", data);
+    io.sockets.emit("usersUpdate", socketsStatus);
   });
 });
 server.listen(PORT, () => {

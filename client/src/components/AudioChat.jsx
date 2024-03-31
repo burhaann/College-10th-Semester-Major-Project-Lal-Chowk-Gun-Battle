@@ -1,0 +1,198 @@
+import "./AudioChat.css";
+import { socket } from "./SocketManager";
+import { useEffect, useState } from "react";
+import { BiMicrophoneOff, BiMicrophone } from "react-icons/bi";
+import { myPlayer, usePlayersList } from "playroomkit";
+
+const AudioChat = () => {
+  const [username, setUsername] = useState("");
+
+  const players = usePlayersList(true);
+  const name = players.map((player) =>
+    myPlayer()?.id === player.id ? player.state.profile?.name : ""
+  );
+
+  useEffect(() => {
+    if (name[0] === "") {
+      return;
+    }
+    if (name[0]) {
+      setUsername(name[0]);
+      socket.emit("joinedusername", username);
+      socket.username = username;
+    }
+  }, [name]);
+
+  //----------------------------------------------------------------
+  const [userStatus, setUserStatus] = useState({
+    microphone: false,
+    mute: false,
+    username: username,
+    online: false,
+  });
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    socket.emit("userInformation", userStatus);
+    return () => {};
+  }, []);
+
+  useEffect(() => {
+    socket.emit("userInformation", userStatus);
+  }, [userStatus]);
+
+  useEffect(() => {
+    let time = 500;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      var madiaRecorder = new MediaRecorder(stream);
+      madiaRecorder.start();
+
+      var audioChunks = [];
+
+      madiaRecorder.addEventListener("dataavailable", function (event) {
+        audioChunks.push(event.data);
+      });
+
+      madiaRecorder.addEventListener("stop", function () {
+        var audioBlob = new Blob(audioChunks);
+
+        audioChunks = [];
+
+        var fileReader = new FileReader();
+        fileReader.readAsDataURL(audioBlob);
+        fileReader.onloadend = function () {
+          if (!userStatus.microphone || !userStatus.online) return;
+
+          var base64String = fileReader.result;
+          socket.emit("voice", base64String);
+        };
+
+        madiaRecorder.start();
+
+        setTimeout(function () {
+          madiaRecorder.stop();
+        }, time);
+      });
+
+      setTimeout(function () {
+        madiaRecorder.stop();
+      }, time);
+    });
+    function onUsersUpdate(data) {
+      setUsers(Object.values(data).map((user) => user.username));
+    }
+    function onSend(data) {
+      var audio = new Audio(data);
+      audio.play();
+    }
+    socket.on("send", onSend);
+    socket.on("usersUpdate", onUsersUpdate);
+
+    return () => {
+      socket.off("send", onSend);
+      socket.off("usersUpdate", onUsersUpdate);
+    };
+  }, [userStatus.microphone, userStatus.online]);
+
+  useEffect(() => {
+    setUserStatus((prevStatus) => ({
+      ...prevStatus,
+      username: username,
+    }));
+    return () => {};
+  }, [username]);
+  function toggleConnection() {
+    setUserStatus((prevStatus) => ({
+      ...prevStatus,
+      online: !prevStatus.online,
+    }));
+  }
+
+  function toggleMute() {
+    setUserStatus((prevStatus) => ({
+      ...prevStatus,
+      mute: !prevStatus.mute,
+    }));
+  }
+
+  function toggleMicrophone() {
+    setUserStatus((prevStatus) => ({
+      ...prevStatus,
+      microphone: !prevStatus.microphone,
+    }));
+  }
+
+  //----------------------------------------------------------------
+  const [isChatVisible, setIsChatVisible] = useState(false);
+  const toggleChatVisibility = () => {
+    setIsChatVisible((prevIsVisible) => !prevIsVisible);
+  };
+  useEffect(() => {
+    const handleXKeyPress = (event) => {
+      if (
+        (event.ctrlKey && event.key === "z") ||
+        (event.ctrlKey && event.key === "Z")
+      ) {
+        toggleChatVisibility();
+      }
+    };
+
+    document.addEventListener("keydown", handleXKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleXKeyPress);
+    };
+  }, []);
+  return (
+    <>
+      <div className="container-voice">
+        <div
+          className={`chat-container-voice ${
+            isChatVisible ? "visible" : "hidden"
+          }`}
+        >
+          <div className="chat-messages-voice">
+            <ul className="users">
+              {users.map((username, index) => (
+                <li key={index}>{username}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="chat-input-container-voice">
+            <div className="controller">
+              <button
+                className={`control-btn ${
+                  userStatus.microphone ? "enable-btn" : "disable-btn"
+                }`}
+                onClick={toggleMicrophone}
+              >
+                {userStatus.microphone ? "Close Microphone" : "Open Microphone"}
+              </button>
+              <button
+                className={`control-btn ${
+                  userStatus.mute ? "enable-btn" : "disable-btn"
+                }`}
+                onClick={toggleMute}
+              >
+                {userStatus.mute ? "Unmute" : "Mute"}
+              </button>
+              <button
+                className={`control-btn ${
+                  userStatus.online ? "enable-btn" : "disable-btn"
+                }`}
+                onClick={toggleConnection}
+              >
+                {userStatus.online ? "Go offline" : "Go online"}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button className="toggle-button-voice" onClick={toggleChatVisibility}>
+          {isChatVisible ? "Hide Audio" : "Show Audio"}
+        </button>
+      </div>
+    </>
+  );
+};
+
+export default AudioChat;
