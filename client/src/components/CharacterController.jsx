@@ -1,4 +1,9 @@
-import { Billboard, CameraControls, Text } from "@react-three/drei";
+import {
+  Billboard,
+  CameraControls,
+  OrbitControls,
+  Text,
+} from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody, vec3 } from "@react-three/rapier";
 import { isHost } from "playroomkit";
@@ -8,7 +13,7 @@ const MOVEMENT_SPEED = 202;
 const FIRE_RATE = 380;
 export const WEAPON_OFFSET = {
   x: -0.2,
-  y: 1.4,
+  y: 0.8,
   z: 0.8,
 };
 
@@ -68,8 +73,8 @@ export const CharacterController = ({
   useFrame((_, delta) => {
     // CAMERA FOLLOW
     if (controls.current) {
-      const cameraDistanceY = window.innerWidth < 1024 ? 16 : 20;
-      const cameraDistanceZ = window.innerWidth < 1024 ? 12 : 16;
+      const cameraDistanceY = window.innerWidth < 1024 ? 20 : 20;
+      const cameraDistanceZ = window.innerWidth < 1024 ? 16 : 16;
       const playerWorldPos = vec3(rigidbody.current.translation());
       controls.current.setLookAt(
         playerWorldPos.x,
@@ -143,9 +148,34 @@ export const CharacterController = ({
     }
   }, [character.current]);
 
+  const [cameraFollowingPlayer, setCameraFollowingPlayer] = useState(true);
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (
+        (event.ctrlKey && event.key === "c") ||
+        (event.ctrlKey && event.key === "C")
+      ) {
+        setCameraFollowingPlayer(
+          (prevCameraFollowingPlayer) => !prevCameraFollowingPlayer
+        );
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
+
   return (
     <group {...props} ref={group}>
-      {userPlayer && <CameraControls ref={controls} />}
+      {userPlayer && cameraFollowingPlayer ? (
+        <CameraControls ref={controls} />
+      ) : (
+        <OrbitControls maxDistance={20} />
+      )}
       <RigidBody
         ref={rigidbody}
         colliders={false}

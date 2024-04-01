@@ -90,7 +90,7 @@ export function CharacterSoldier({
   }, [nodes, clone]);
 
   return (
-    <group {...props} dispose={null} ref={group} scale={[0.75, 0.75, 0.75]}>
+    <group {...props} dispose={null} ref={group} scale={[0.6, 0.6, 0.6]}>
       <group name="Scene">
         <group name="CharacterArmature">
           <primitive object={nodes.Root} />

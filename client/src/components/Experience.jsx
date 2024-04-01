@@ -101,7 +101,8 @@ export const Experience = ({ downgradedPerformance = false }) => {
       {(isHost() ? hits : networkHits).map((hit) => (
         <BulletHit key={hit.id} {...hit} onEnded={() => onHitEnded(hit.id)} />
       ))}
-      <Environment preset="sunset" />
+      {/* <Environment preset="sunset" /> */}
+      <Environment files="/models/sky-02.hdr" background />
     </>
   );
 };
