@@ -148,34 +148,9 @@ export const CharacterController = ({
     }
   }, [character.current]);
 
-  const [cameraFollowingPlayer, setCameraFollowingPlayer] = useState(true);
-
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (
-        (event.ctrlKey && event.key === "c") ||
-        (event.ctrlKey && event.key === "C")
-      ) {
-        setCameraFollowingPlayer(
-          (prevCameraFollowingPlayer) => !prevCameraFollowingPlayer
-        );
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
-
   return (
     <group {...props} ref={group}>
-      {userPlayer && cameraFollowingPlayer ? (
-        <CameraControls ref={controls} />
-      ) : (
-        <OrbitControls maxDistance={20} />
-      )}
+      {userPlayer && <CameraControls ref={controls} />}
       <RigidBody
         ref={rigidbody}
         colliders={false}
