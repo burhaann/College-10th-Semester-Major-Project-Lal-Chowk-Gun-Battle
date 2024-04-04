@@ -41,45 +41,63 @@ const AudioChat = () => {
 
   useEffect(() => {
     let time = 500;
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      var madiaRecorder = new MediaRecorder(stream);
-      madiaRecorder.start();
+    let stream, madiaRecorder;
+    userStatusRef.current.microphone
+      ? navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((istream) => {
+            stream = istream;
+            madiaRecorder = new MediaRecorder(stream);
+            madiaRecorder.start();
 
-      var audioChunks = [];
+            var audioChunks = [];
 
-      madiaRecorder.addEventListener("dataavailable", function (event) {
-        audioChunks.push(event.data);
-      });
+            madiaRecorder.addEventListener("dataavailable", function (event) {
+              audioChunks.push(event.data);
+            });
 
-      madiaRecorder.addEventListener("stop", function () {
-        var audioBlob = new Blob(audioChunks);
+            madiaRecorder.addEventListener("stop", function () {
+              var audioBlob = new Blob(audioChunks);
 
-        audioChunks = [];
+              audioChunks = [];
 
-        var fileReader = new FileReader();
-        fileReader.readAsDataURL(audioBlob);
-        fileReader.onloadend = function () {
-          if (
-            !userStatusRef.current.microphone ||
-            !userStatusRef.current.online
-          )
-            return;
+              var fileReader = new FileReader();
+              fileReader.readAsDataURL(audioBlob);
+              fileReader.onloadend = function () {
+                if (
+                  !userStatusRef.current.microphone ||
+                  !userStatusRef.current.online
+                )
+                  return;
 
-          var base64String = fileReader.result;
-          socket.emit("voice", base64String);
-        };
+                var base64String = fileReader.result;
+                socket.emit("voice", base64String);
+              };
 
-        madiaRecorder.start();
+              madiaRecorder.start();
 
-        setTimeout(function () {
-          madiaRecorder.stop();
-        }, time);
-      });
+              setTimeout(function () {
+                madiaRecorder.stop();
+              }, time);
+            });
 
-      setTimeout(function () {
+            setTimeout(function () {
+              madiaRecorder.stop();
+            }, time);
+          })
+          .catch((error) => {
+            console.error("Error accessing microphone:", error);
+          })
+      : stopRecording();
+    function stopRecording() {
+      if (madiaRecorder) {
         madiaRecorder.stop();
-      }, time);
-    });
+      }
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+        stream.getAudioTracks().forEach((track) => track.stop());
+      }
+    }
     function onUsersUpdate(data) {
       setUsers(Object.values(data).map((user) => user.username));
     }
