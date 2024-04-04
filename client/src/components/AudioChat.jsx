@@ -33,6 +33,8 @@ const AudioChat = () => {
   const [users, setUsers] = useState([]);
 
   const userStatusRef = useRef(userStatus);
+  const streamRef = useRef();
+  // const mediaRecorderRef = useRef();
 
   useEffect(() => {
     socket.emit("userInformation", userStatus);
@@ -41,22 +43,24 @@ const AudioChat = () => {
 
   useEffect(() => {
     let time = 500;
-    let stream, madiaRecorder;
+
     userStatusRef.current.microphone
       ? navigator.mediaDevices
           .getUserMedia({ audio: true })
-          .then((istream) => {
-            stream = istream;
-            madiaRecorder = new MediaRecorder(stream);
-            madiaRecorder.start();
+          .then((stream) => {
+            streamRef.current = stream;
+            var mediaRecorder = new MediaRecorder(stream);
+            // mediaRecorderRef.current = mediaRecorder;
+
+            mediaRecorder.start();
 
             var audioChunks = [];
 
-            madiaRecorder.addEventListener("dataavailable", function (event) {
+            mediaRecorder.addEventListener("dataavailable", function (event) {
               audioChunks.push(event.data);
             });
 
-            madiaRecorder.addEventListener("stop", function () {
+            mediaRecorder.addEventListener("stop", function () {
               var audioBlob = new Blob(audioChunks);
 
               audioChunks = [];
@@ -74,15 +78,15 @@ const AudioChat = () => {
                 socket.emit("voice", base64String);
               };
 
-              madiaRecorder.start();
+              if (userStatusRef.current.microphone) mediaRecorder.start();
 
               setTimeout(function () {
-                madiaRecorder.stop();
+                mediaRecorder.stop();
               }, time);
             });
 
             setTimeout(function () {
-              madiaRecorder.stop();
+              mediaRecorder.stop();
             }, time);
           })
           .catch((error) => {
@@ -90,12 +94,12 @@ const AudioChat = () => {
           })
       : stopRecording();
     function stopRecording() {
-      if (madiaRecorder) {
-        madiaRecorder.stop();
-      }
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-        stream.getAudioTracks().forEach((track) => track.stop());
+      // if (mediaRecorderRef.current) {
+      //   mediaRecorderRef.current.stop();
+      // }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        // streamRef.current.getAudioTracks().forEach((track) => track.stop());
       }
     }
     function onUsersUpdate(data) {
