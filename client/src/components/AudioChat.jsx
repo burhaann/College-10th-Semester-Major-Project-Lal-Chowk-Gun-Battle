@@ -42,7 +42,7 @@ const AudioChat = () => {
   }, [userStatus]);
 
   useEffect(() => {
-    let time = 500;
+    let time = 100;
 
     userStatusRef.current.microphone
       ? navigator.mediaDevices
