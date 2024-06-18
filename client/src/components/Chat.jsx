@@ -109,6 +109,7 @@ const Chat = () => {
           {messages.map((message, index) => (
             <div key={index}>
               <b>{message?.username}:</b> {message.input}
+              <hr  className="chat-hr-style" />
             </div>
           ))}
         </div>

@@ -52,6 +52,13 @@ body {
   margin-top: 2vh;
 }
 
+.chat-hr-style {
+  margin: 5px 40px 20px;       /* Adds space above and below the horizontal line */
+  border: none;         /* Removes the default border */
+  border: 1px solid rgb(104, 104, 104);  /* Adds a black border on top */
+}
+
+
 .chat-input-container {
   display: flex;
   margin-bottom: 50px;
