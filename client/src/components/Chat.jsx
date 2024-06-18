@@ -7,12 +7,21 @@ const Chat = () => {
   const [messages, setMessages] = useAtom(messagesAtom);
 
   const players = usePlayersList(true);
-  const name = players.map((player) =>
-    myPlayer()?.id === player.id ? player.state.profile?.name : ""
-  );
+  const currentPlayer = myPlayer();
+  // const name = players.map((player) =>
+  //   myPlayer()?.id === player.id ? player.state.profile?.name : ""
+  // );
+  // useEffect(() => {
+  //   setUsername(name[0]);
+  // }, [name[0]]);
   useEffect(() => {
-    setUsername(name[0]);
-  }, [name[0]]);
+    if (players.length > 0 && currentPlayer) {
+      const currentPlayerData = players.find(player => player.id === currentPlayer.id);
+      if (currentPlayerData && currentPlayerData.state.profile?.name) {
+        setUsername(currentPlayerData.state.profile.name);
+      }
+    }
+  }, [players, currentPlayer]);
 
   const [input, setInput] = useState("");
   const [username, setUsername] = useState("");

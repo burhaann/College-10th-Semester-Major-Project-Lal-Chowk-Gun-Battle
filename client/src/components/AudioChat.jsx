@@ -8,20 +8,33 @@ const AudioChat = () => {
   const [username, setUsername] = useState("");
 
   const players = usePlayersList(true);
-  const name = players.map((player) =>
-    myPlayer()?.id === player.id ? player.state.profile?.name : ""
-  );
+  const currentPlayer = myPlayer();
+  // const name = players.map((player) =>
+  //   myPlayer()?.id === player.id ? player.state.profile?.name : ""
+  // );
 
+  // useEffect(() => {
+  //   if (name[0] === "") {
+  //     return;
+  //   }
+  //   if (name[0]) {
+  //     setUsername(name[0]);
+  //     socket.emit("joinedusername", username);
+  //     socket.username = username;
+  //   }
+  // }, [name]);
   useEffect(() => {
-    if (name[0] === "") {
-      return;
+    if (players.length > 0 && currentPlayer) {
+      const currentPlayerData = players.find(player => player.id === currentPlayer.id);
+      const playerName = currentPlayerData?.state.profile?.name || "";
+      
+      if (playerName && playerName !== username) {
+        setUsername(playerName);
+        socket.emit("joinedusername", playerName);
+        socket.username = playerName;
+      }
     }
-    if (name[0]) {
-      setUsername(name[0]);
-      socket.emit("joinedusername", username);
-      socket.username = username;
-    }
-  }, [name]);
+  }, [players, currentPlayer, username]);
 
   //----------------------------------------------------------------
   const [userStatus, setUserStatus] = useState({
