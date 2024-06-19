@@ -70,6 +70,81 @@ export const CharacterController = ({
     }
   }, [state.state.health]);
 
+  //Pree F to fire the weapon
+
+  // Function to fire a bullet
+  const fireBullet = () => {
+    // Get the player's current rotation
+    const playerRotationY = character.current.rotation.y;
+
+    // Calculate the direction vector based on the player's rotation
+    const direction = {
+      x: Math.sin(playerRotationY),
+      y: 0,
+      z: Math.cos(playerRotationY),
+    };
+
+    // Set animation based on movement state
+    setAnimation(
+      keys.current.w || keys.current.a || keys.current.s || keys.current.d
+        ? "Run_Shoot"
+        : "Idle_Shoot"
+    );
+
+    // Fire bullet logic
+    if (isHost() && Date.now() - lastShoot.current > FIRE_RATE) {
+      lastShoot.current = Date.now();
+      const newBullet = {
+        id: `${state.id}-${+new Date()}`,
+        position: vec3(rigidbody.current.translation()),
+        angle: playerRotationY, // Use player's rotation as the angle
+        player: state.id,
+      };
+      onFire(newBullet);
+    }
+  };
+  // Key state
+  const keys = useRef({
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+  });
+
+  // Key press handler
+  const handleKeyPress = (event) => {
+    const key = event.key.toLowerCase();
+    // Map arrow keys to corresponding WASD keys
+    const keyMap = {
+      arrowup: "w",
+      arrowleft: "a",
+      arrowdown: "s",
+      arrowright: "d",
+    };
+
+    if (keys.current.hasOwnProperty(key)) {
+      keys.current[key] = event.type === "keydown";
+    } else if (key in keyMap && keys.current.hasOwnProperty(keyMap[key])) {
+      keys.current[keyMap[key]] = event.type === "keydown";
+    }
+
+    // Handle fire button (F key)
+    if (event.key === "f" || event.key === "F") {
+      fireBullet();
+    }
+  };
+  useEffect(() => {
+    // Add event listeners for key press
+    window.addEventListener("keydown", handleKeyPress);
+    window.addEventListener("keyup", handleKeyPress);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keyup", handleKeyPress);
+    };
+  }, []);
+
   useFrame((_, delta) => {
     // CAMERA FOLLOW
     if (controls.current) {
@@ -92,26 +167,55 @@ export const CharacterController = ({
       return;
     }
 
-    // Update player position based on joystick state
-    const angle = joystick.angle();
-    if (joystick.isJoystickPressed() && angle) {
-      setAnimation("Run");
-      character.current.rotation.y = angle;
+    // Update player position based on keys
+    const moveDirection = { x: 0, y: 0, z: 0 };
 
-      // move character in its own direction
+    if (keys.current.w) moveDirection.z -= 1;
+    if (keys.current.s) moveDirection.z += 1;
+    if (keys.current.a) moveDirection.x -= 1;
+    if (keys.current.d) moveDirection.x += 1;
+
+    if (moveDirection.x !== 0 || moveDirection.z !== 0) {
+      const magnitude = Math.sqrt(moveDirection.x ** 2 + moveDirection.z ** 2);
+      const normalizedDirection = {
+        x: (moveDirection.x / magnitude) * MOVEMENT_SPEED * delta,
+        z: (moveDirection.z / magnitude) * MOVEMENT_SPEED * delta,
+      };
+
       const impulse = {
-        x: Math.sin(angle) * MOVEMENT_SPEED * delta,
+        x: normalizedDirection.x,
         y: 0,
-        z: Math.cos(angle) * MOVEMENT_SPEED * delta,
+        z: normalizedDirection.z,
       };
 
       rigidbody.current.applyImpulse(impulse, true);
+
+      const angle = Math.atan2(-moveDirection.z, moveDirection.x) + Math.PI / 2;
+      character.current.rotation.y = angle;
+      setAnimation("Run");
     } else {
-      setAnimation("Idle");
+      // Update player position based on joystick state
+      const angle = joystick.angle();
+      if (joystick.isJoystickPressed() && angle) {
+        setAnimation("Run");
+        character.current.rotation.y = angle;
+
+        // move character in its own direction
+        const impulse = {
+          x: Math.sin(angle) * MOVEMENT_SPEED * delta,
+          y: 0,
+          z: Math.cos(angle) * MOVEMENT_SPEED * delta,
+        };
+
+        rigidbody.current.applyImpulse(impulse, true);
+      } else {
+        setAnimation("Idle");
+      }
     }
 
     // Check if fire button is pressed
     if (joystick.isPressed("fire")) {
+      const angle = character.current.rotation.y;
       // fire
       setAnimation(
         joystick.isJoystickPressed() && angle ? "Run_Shoot" : "Idle_Shoot"
