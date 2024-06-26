@@ -9,6 +9,7 @@ import { CapsuleCollider, RigidBody, vec3 } from "@react-three/rapier";
 import { isHost } from "playroomkit";
 import { useEffect, useRef, useState } from "react";
 import { CharacterSoldier } from "./CharacterSoldier";
+import { myPlayer } from "playroomkit";
 const MOVEMENT_SPEED = 202;
 const FIRE_RATE = 380;
 export const WEAPON_OFFSET = {
@@ -67,83 +68,79 @@ export const CharacterController = ({
       const audio = new Audio("/audios/hurt.mp3");
       audio.volume = 0.4;
       audio.play();
-    }
+    } 
   }, [state.state.health]);
 
-  //Pree F to fire the weapon
+  /////////////////////////////////////////////////////////////////////////////////
+  
+  // const moveDirection = useRef({ x: 0, z: 0 });
 
-  // Function to fire a bullet
-  const fireBullet = () => {
-    // Get the player's current rotation
-    const playerRotationY = character.current.rotation.y;
 
-    // Calculate the direction vector based on the player's rotation
-    const direction = {
-      x: Math.sin(playerRotationY),
-      y: 0,
-      z: Math.cos(playerRotationY),
-    };
+  // // Key state
+  // const keys = useRef({
+  //   w: false,
+  //   a: false,
+  //   s: false,
+  //   d: false,
+  // });
+  // const firebutton = useRef(false);
 
-    // Set animation based on movement state
-    setAnimation(
-      keys.current.w || keys.current.a || keys.current.s || keys.current.d
-        ? "Run_Shoot"
-        : "Idle_Shoot"
-    );
+  // // Key press handler
+  // const handleKeyPress = (event) => {
+  //   const key = event.key.toLowerCase();
+  //   // console.log(key);
+  //   // Map arrow keys to corresponding WASD keys
+  //   const keyMap = {
+  //     arrowup: "w",
+  //     arrowleft: "a",
+  //     arrowdown: "s",
+  //     arrowright: "d",
+  //   };
 
-    // Fire bullet logic
-    if (isHost() && Date.now() - lastShoot.current > FIRE_RATE) {
-      lastShoot.current = Date.now();
-      const newBullet = {
-        id: `${state.id}-${+new Date()}`,
-        position: vec3(rigidbody.current.translation()),
-        angle: playerRotationY, // Use player's rotation as the angle
-        player: state.id,
-      };
-      onFire(newBullet);
-    }
-  };
-  // Key state
-  const keys = useRef({
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-  });
+  //   if (keys.current.hasOwnProperty(key)) {
+  //     keys.current[key] = event.type === "keydown";
+  //   } else if (key in keyMap && keys.current.hasOwnProperty(keyMap[key])) {
+  //     keys.current[keyMap[key]] = event.type === "keydown";
+  //   }
 
-  // Key press handler
-  const handleKeyPress = (event) => {
-    const key = event.key.toLowerCase();
-    // Map arrow keys to corresponding WASD keys
-    const keyMap = {
-      arrowup: "w",
-      arrowleft: "a",
-      arrowdown: "s",
-      arrowright: "d",
-    };
+  //   // Handle fire button (F key)
+  //   if (key === "f" && event.type === "keydown") {
+  //     firebutton.current = true;
+  //   }
+  //   if (key === "f" && event.type === "keyup") {
+  //     firebutton.current = false;
+  //   }
 
-    if (keys.current.hasOwnProperty(key)) {
-      keys.current[key] = event.type === "keydown";
-    } else if (key in keyMap && keys.current.hasOwnProperty(keyMap[key])) {
-      keys.current[keyMap[key]] = event.type === "keydown";
-    }
+  // };
+  // const handleMouseDown = (e) => {
+  //   if (e.button === 0) {
+  //     // Left mouse button
+  //     firebutton.current = true;
+  //   }
+  // };
 
-    // Handle fire button (F key)
-    if (event.key === "f" || event.key === "F") {
-      fireBullet();
-    }
-  };
-  useEffect(() => {
-    // Add event listeners for key press
-    window.addEventListener("keydown", handleKeyPress);
-    window.addEventListener("keyup", handleKeyPress);
+  // const handleMouseUp = (e) => {
+  //   if (e.button === 0) {
+  //     // Left mouse button
+  //     firebutton.current = false;
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (!userPlayer) return;
+  //   // Add event listeners for key press
+  //   window.addEventListener("keydown", handleKeyPress);
+  //   window.addEventListener("keyup", handleKeyPress);
+  //   window.addEventListener("mousedown", handleMouseDown);
+  //   window.addEventListener("mouseup", handleMouseUp);
 
-    // Cleanup event listeners on component unmount
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-      window.removeEventListener("keyup", handleKeyPress);
-    };
-  }, []);
+  //   // Cleanup event listeners on component unmount
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKeyPress);
+  //     window.removeEventListener("keyup", handleKeyPress);
+  //     window.removeEventListener("mousedown", handleMouseDown);
+  //     window.removeEventListener("mouseup", handleMouseUp);
+  //   };
+  // }, [userPlayer]);
 
   useFrame((_, delta) => {
     // CAMERA FOLLOW
@@ -167,56 +164,89 @@ export const CharacterController = ({
       return;
     }
 
-    // Update player position based on keys
-    const moveDirection = { x: 0, y: 0, z: 0 };
+    // // Update player position based on keys
+    // const moveDirection = { x: 0, y: 0, z: 0 };
 
-    if (keys.current.w) moveDirection.z -= 1;
-    if (keys.current.s) moveDirection.z += 1;
-    if (keys.current.a) moveDirection.x -= 1;
-    if (keys.current.d) moveDirection.x += 1;
+    // if (keys.current.w) moveDirection.z -= 1;
+    // if (keys.current.s) moveDirection.z += 1;
+    // if (keys.current.a) moveDirection.x -= 1;
+    // if (keys.current.d) moveDirection.x += 1;
 
-    if (moveDirection.x !== 0 || moveDirection.z !== 0) {
-      const magnitude = Math.sqrt(moveDirection.x ** 2 + moveDirection.z ** 2);
-      const normalizedDirection = {
-        x: (moveDirection.x / magnitude) * MOVEMENT_SPEED * delta,
-        z: (moveDirection.z / magnitude) * MOVEMENT_SPEED * delta,
-      };
+    // if (moveDirection.x !== 0 || moveDirection.z !== 0) {
+    //   const magnitude = Math.sqrt(moveDirection.x ** 2 + moveDirection.z ** 2);
+    //   const normalizedDirection = {
+    //     x: (moveDirection.x / magnitude) * MOVEMENT_SPEED * delta,
+    //     z: (moveDirection.z / magnitude) * MOVEMENT_SPEED * delta,
+    //   };
 
+    //   const impulse = {
+    //     x: normalizedDirection.x,
+    //     y: 0,
+    //     z: normalizedDirection.z,
+    //   };
+    //   rigidbody.current.applyImpulse(impulse, true);
+    //   const angle = Math.atan2(-moveDirection.z, moveDirection.x) + Math.PI / 2;
+    //   character.current.rotation.y = angle;
+    //   setAnimation("Run");
+    // }  else {
+    //   setAnimation("Idle");
+    // }
+
+    // // Update player position based on joystick state
+ 
+    // const angle = joystick.angle();
+
+    // // Calculate movement from keyboard input
+    // moveDirection.current.x = (keys.current.d ? 1 : 0) - (keys.current.a ? 1 : 0);
+    // moveDirection.current.z = (keys.current.s ? 1 : 0) - (keys.current.w ? 1 : 0);
+
+    // // Combine keyboard and joystick input
+    // const inputX = moveDirection.current.x;
+    // const inputZ = moveDirection.current.z;
+
+    // if (inputX !== 0 || inputZ !== 0) {
+
+    //   setAnimation("Run");
+    //   const angleof = Math.atan2(inputX, inputZ);
+    //   character.current.rotation.y = angleof;
+
+    //     // move character in its own direction
+    //     const impulse = {
+    //       x: Math.sin(angleof) * MOVEMENT_SPEED * delta,
+    //       y: 0,
+    //       z: Math.cos(angleof) * MOVEMENT_SPEED * delta,
+    //     };
+  
+    //     rigidbody.current.applyImpulse(impulse, true);
+
+    // } else 
+    
+    if (joystick.isJoystickPressed() && angle) {
+      setAnimation("Run");
+      character.current.rotation.y = angle;
+
+      // move character in its own direction
       const impulse = {
-        x: normalizedDirection.x,
+        x: Math.sin(angle) * MOVEMENT_SPEED * delta,
         y: 0,
-        z: normalizedDirection.z,
+        z: Math.cos(angle) * MOVEMENT_SPEED * delta,
       };
 
       rigidbody.current.applyImpulse(impulse, true);
-
-      const angle = Math.atan2(-moveDirection.z, moveDirection.x) + Math.PI / 2;
-      character.current.rotation.y = angle;
-      setAnimation("Run");
     } else {
-      // Update player position based on joystick state
-      const angle = joystick.angle();
-      if (joystick.isJoystickPressed() && angle) {
-        setAnimation("Run");
-        character.current.rotation.y = angle;
-
-        // move character in its own direction
-        const impulse = {
-          x: Math.sin(angle) * MOVEMENT_SPEED * delta,
-          y: 0,
-          z: Math.cos(angle) * MOVEMENT_SPEED * delta,
-        };
-
-        rigidbody.current.applyImpulse(impulse, true);
-      } else {
-        setAnimation("Idle");
-      }
-    }
+      setAnimation("Idle");
+    } 
+  
+    
 
     // Check if fire button is pressed
+    // if (firebutton.current || joystick.isPressed("fire")) {
     if (joystick.isPressed("fire")) {
       const angle = character.current.rotation.y;
       // fire
+      // setAnimation(
+      //   (joystick.isJoystickPressed() && angle) || (inputX !== 0 || inputZ !== 0) ? "Run_Shoot" : "Idle_Shoot"
+      // );
       setAnimation(
         joystick.isJoystickPressed() && angle ? "Run_Shoot" : "Idle_Shoot"
       );
@@ -252,6 +282,20 @@ export const CharacterController = ({
     }
   }, [character.current]);
 
+  const heal = () => {
+    if (state.state.health < 100 && state.state.health > 0) {
+      state.setState("health", 100);
+      const audio = new Audio("/audios/heal.mp3");
+      audio.volume = 0.5;
+      audio.play();
+    } else if (state.state.health >= 100) {
+      console.log("DONE: Health");
+      const audio = new Audio("/audios/full-health.mp3");
+      audio.volume = 0.05;
+      audio.play();
+    }
+  };
+
   return (
     <group {...props} ref={group}>
       {userPlayer && <CameraControls ref={controls} />}
@@ -284,6 +328,11 @@ export const CharacterController = ({
             } else {
               state.setState("health", newHealth);
             }
+          } else if (
+            isHost() &&
+            other.rigidBodyObject.userData.type === "healingOrb"
+          ) {
+            heal();
           }
         }}
       >

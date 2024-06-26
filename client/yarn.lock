@@ -1565,10 +1565,10 @@ pirates@^4.0.1:
   resolved "https://registry.npmjs.org/pirates/-/pirates-4.0.6.tgz"
   integrity sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==
 
-playroomkit@^0.0.71:
-  version "0.0.71"
-  resolved "https://registry.npmjs.org/playroomkit/-/playroomkit-0.0.71.tgz"
-  integrity sha512-t80VcNm1pEgHt71rtP/pAgXS88/PZxyTY71D0FL7ps5ON7lNZGpCV7MPo/MLayH3GABcILC7/IovAbAENWRbQg==
+playroomkit@^0.0.77:
+  version "0.0.77"
+  resolved "https://registry.npmjs.org/playroomkit/-/playroomkit-0.0.77.tgz"
+  integrity sha512-NpGLfkzTt0dnIvUXdN/65amlfUUI535V7c7aj0RmWZv8nYDd0Nrk6k3qHPriEumfwF//5A2OvNPumZLteItSmg==
   optionalDependencies:
     "@discord/embedded-app-sdk" ">=1.0.0"
 

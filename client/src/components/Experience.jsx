@@ -12,6 +12,7 @@ import { Bullet } from "./Bullet";
 import { BulletHit } from "./BulletHit";
 import { CharacterController } from "./CharacterController";
 import { Map } from "./Map";
+import {HealingOrb} from "./HealingOrb"
 
 export const Experience = ({ downgradedPerformance = false }) => {
   const [players, setPlayers] = useState([]);
@@ -103,6 +104,9 @@ export const Experience = ({ downgradedPerformance = false }) => {
       ))}
       {/* <Environment preset="sunset" /> */}
       <Environment files="/models/sky-02.hdr" background />
+
+      {/* {Healing Orb} */}
+      <HealingOrb position={[18, 1, -3]} />
     </>
   );
 };
