@@ -220,7 +220,9 @@ export const CharacterController = ({
     //     rigidbody.current.applyImpulse(impulse, true);
 
     // } else 
-    
+
+    const angle = joystick.angle();
+
     if (joystick.isJoystickPressed() && angle) {
       setAnimation("Run");
       character.current.rotation.y = angle;
